@@ -114,6 +114,14 @@ class TimerView {
       } else {
         block.classList.add(name);
         this.pvtBlockList[name] = block;
+
+        switch (name) {
+          case 's':
+            block.innerText = '00.00';
+            break;
+          default:
+            block.innerText = '00';
+        }
       }
       view.appendChild(block);
     });
