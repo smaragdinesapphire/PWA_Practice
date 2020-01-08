@@ -1,0 +1,47 @@
+.Timer {
+  border: 3px solid black;
+  background-color: gainsboro;
+  width: 200px;
+}
+.Timer .view-container {
+  padding: 0 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+}
+.Timer .view-container .view {
+  font-size: 30px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  background-color: white;
+  flex-grow: 1;
+}
+.Timer .view-container .view > div {
+  text-align: center;
+}
+.Timer .view-container .view .h, .Timer .view-container .view .m {
+  width: 35px;
+}
+.Timer .view-container .view .s {
+  width: 70px;
+}
+.Timer .view-container .view .sign {
+  padding: 0 1px;
+}
+.Timer .button-container {
+  padding: 0 5px;
+  display: flex;
+  height: 50px;
+  justify-content: center;
+  align-items: center;
+}
+.Timer .button-container .button {
+  width: 0;
+  flex-grow: 1;
+  margin: 0 2px;
+  height: 40px;
+}

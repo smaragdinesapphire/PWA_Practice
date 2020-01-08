@@ -1,58 +1,92 @@
 class TimerAdapter {
   constructor() {
-    this.pvtIsStart = false;
+    this.pvtIsPause = true;
     this.pvtStartTime = 0;
+    this.pvtTotal = 0;
     this.pvtTimer = null;
-    
+    this.pvtDeff = null;
+
     this.pvtHandleUpdate = this.pvtHandleUpdate.bind(this);
 
     this.onChangeTime = null;
   }
 
   start() {
-    if (!this.pvtIsStart) {
-      this.pvtIsStart = true;
+    if (this.pvtIsPause) {
+      this.pvtIsPause = false;
       this.pvtStartTime = (new Date()).getTime();
+      this.pvtStartTimer();
     }
-    this.pvtStartTimer();
   }
 
   pvtStartTimer() {
-    if (!this.pvtTimer) {
-      this.pvtTimer = setInterval(this.pvtHandleUpdate, 10);
-    }
+    this.pvtTimer = setInterval(this.pvtHandleUpdate, 10);
   }
 
   pvtHandleUpdate() {
     const currentTime = (new Date()).getTime();
-    const deff = Math.floor((currentTime - this.pvtStartTime) / 10) / 100;
-    const s = deff % 60;
-    const h = Math.floor(deff / (60 * 60));
-    const m = (deff - (h * 60 * 60) - s) / 60; 
+    this.pvtDeff = currentTime - this.pvtStartTime;
+
+    const total = Math.floor((this.pvtTotal + this.pvtDeff) / 10) / 100;
+    const s = total % 60;
+    const h = Math.floor( total / (60 * 60));
+    const m = ( total - (h * 60 * 60) - s) / 60; 
+
     if (typeof this.onChangeTime === 'function') {
-      this.onChangeTime(`${this.pvtInsertZeroToHead(h)}:${this.pvtInsertZeroToHead(m)}:${this.pvtInsertZeroToHead(s)}`);
+      this.onChangeTime({
+        h: this.pvtInsertZero(h, 2),
+        m: this.pvtInsertZero(m, 2),
+        s: this.pvtInsertZero(s, 2, 2),
+      });
+
     }
   }
 
-  pvtInsertZeroToHead(propStr, digit) {
+  pvtInsertZero(propStr, digit, decimal) {
     let str = String(propStr);
-    while (str.length < digit) {
-      str = `0${str}`;
+    let [ left, right ] = str.split('.');
+
+    while (left.length < digit) {
+      left = `0${left}`;
     }
-    return str;
+
+    if (!right) {
+      right = "";
+    }
+
+    if (decimal) {
+      while (right.length < decimal) {
+        right = `${right}0`;
+      }
+      right = `.${right}`;
+    }
+
+    return `${left}${right}`;
   }
 
-  pause() {
+  pvtClearTimer() {
     clearInterval(this.pvtTimer);
-    this.pvtStartTime = (new Date()).getTime();
     this.pvtTimer = null;
   }
 
+  pause() {
+    if (!this.pvtIsPause) {
+      this.pvtTotal += this.pvtDeff;
+      this.pvtIsPause = true;
+      this.pvtClearTimer();
+    }
+  }
+
   reset() {
-    this.pvtIsStart = false;
-    this.pause();
+    this.pvtTotal = 0;
+    this.pvtIsPause = true;
+    this.pvtClearTimer();
     if (typeof this.onChangeTime === 'function') {
-      this.onChangeTime(`${this.pvtInsertZeroToHead(0)}:${this.pvtInsertZeroToHead(0)}:${this.pvtInsertZeroToHead(0)}`);
+      this.onChangeTime({
+        h: '00',
+        m: '00',
+        s: '00.00',
+      });
     }
   }
 }
@@ -60,7 +94,7 @@ class TimerAdapter {
 class TimerView {
   constructor () {
     this.pvtContainer = null;
-    this.pvtView = null;
+    this.pvtBlockList = {};
 
     this.pvtCreateUI();
   }
@@ -69,14 +103,28 @@ class TimerView {
     this.pvtContainer = document.createElement('div');
     this.pvtContainer.classList.add('view-container');
     
-    this.pvtView = document.createElement('div');
-    this.pvtView.classList.add('view');
+    const view = document.createElement('div');
+    view.classList.add('view');
 
-    this.pvtContainer.appendChild(this.pvtView);
+    TimerView.TimeBlockList.forEach((name) => {
+      const block = document.createElement('div');
+      if (name === ':') {
+        block.classList.add('sign');
+        block.innerText = ':';
+      } else {
+        block.classList.add(name);
+        this.pvtBlockList[name] = block;
+      }
+      view.appendChild(block);
+    });
+
+    this.pvtContainer.appendChild(view);
   }
 
-  setContent(str) {
-    this.pvtView.innerText = str;
+  setContent({ h, m, s }) {
+    this.pvtBlockList.h.innerText = h;
+    this.pvtBlockList.m.innerText = m;
+    this.pvtBlockList.s.innerText = s;
   }
 
   render(parent) {
@@ -87,6 +135,8 @@ class TimerView {
     }
   }
 }
+
+TimerView.TimeBlockList = ['h', ':', 'm', ':', 's'];
 
 class TimerButton {
   constructor() {

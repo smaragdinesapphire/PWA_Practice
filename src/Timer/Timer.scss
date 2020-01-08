@@ -1,0 +1,55 @@
+.Timer {
+  border: 3px solid black;
+  background-color: rgb(220, 220, 220);
+  width: 200px;
+
+  .view-container {
+    padding: 0 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+
+    .view {
+      font-size: 30px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid black;
+      background-color: white;
+      flex-grow: 1;
+      
+      > div {
+        text-align: center;  
+      }
+
+      .h, .m {
+        width: 35px;
+      }
+
+      .s {
+        width: 70px;
+      }
+
+      .sign {
+        padding: 0 1px;
+      }
+    }
+  }
+
+  .button-container {
+    padding: 0 5px;
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+
+    .button {
+      width: 0;
+      flex-grow: 1;
+      margin: 0 2px;
+      height: 40px;
+    }
+  }
+}
